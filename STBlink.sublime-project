@@ -7,6 +7,9 @@
   ],
   "settings":
   {
-      "default_line_ending": "unix"
+    "default_line_ending": "unix",
+    "readonly.subfolders": [
+      "./3rd-party"
+    ]
   }
 }

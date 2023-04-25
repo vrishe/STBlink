@@ -1,5 +1,9 @@
+BUILD_CONFIG ?= release
+
 CC=arm-none-eabi-gcc
-CFLAGS=-mcpu=cortex-m3 -mthumb
+CFLAGS.debug := -g
+CFLAGS.release := 
+CFLAGS=-mcpu=cortex-m3 -mthumb $(CFLAGS.$(BUILD_CONFIG))
 CPPFLAGS=-DSTM32F103xB \
  -I./3rd-party/cmsis_device_f1/Include \
  -I./3rd-party/CMSIS_5/CMSIS/Core/Include
@@ -17,6 +21,13 @@ objs += $(out_dir)/system_stm32f1xx.o
 objs += $(out_dir)/startup_stm32f103xb.o
 
 all: $(build_dir)/$(BINARY)
+
+openocd := $(shell openocd --version >/dev/null 2>&1 && echo 'openocd')
+
+ifneq (,$(openocd))
+run: $(build_dir)/$(BINARY)
+	$(openocd) -f 'openocd.cfg' -c 'program $< verify reset exit'
+endif # openocd
 
 $(build_dir)/$(BINARY): $(objs)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
